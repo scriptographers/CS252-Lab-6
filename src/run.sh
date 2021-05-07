@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dd if=/dev/urandom bs=102400 count=1 status=none | base64 >send.txt
+# dd if=/dev/urandom bs=102400 count=1 status=none | base64 >send.txt
 
 # Compile:
 
@@ -26,9 +26,11 @@ echo ""
 
 # Run
 ./s.out &
+P1=$!
 ./c.out &
+P2=$!
 
-wait
+wait $P1 $P2
 
 echo ""
 
