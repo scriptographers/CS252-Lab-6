@@ -49,6 +49,22 @@ int main(){
         exit(EXIT_FAILURE);
     }
 
+    status = setsockopt(
+        // The socket:
+        sockfd,
+        // The socket layer, more info: https://stackoverflow.com/questions/21515946/what-is-sol-socket-used-for
+        SOL_SOCKET,
+        // This option allows your server to bind to an address which is in a TIME_WAIT state 
+        SO_REUSEPORT,
+        // Setting to true
+        &reuse_flag,
+        sizeof(int)
+    );
+    if (status != 0){
+        perror("(Client) An error occured while setting the socket options");
+        exit(EXIT_FAILURE);
+    }
+
     /* Create the TCP Connection */
 
     // Create the struct for the server's address:

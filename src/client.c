@@ -5,6 +5,7 @@
 #include <sys/time.h> // For timeval struct
 #include <sys/socket.h> // For socket programming
 #include <arpa/inet.h> // Provides definitions for internet operations
+#include <netinet/tcp.h> // Includes definitions for TCP
 
 /* Constants */
 int status; // Used for error handling
@@ -13,6 +14,7 @@ const char* LOCAL_HOST = "127.0.0.1"; // Standard address for IPv4 loopback traf
 // int const SIZE = 1024; // gives a weird error for some reason
 int RECV_PORT = 8080;
 char *PATH_SEND = "send.txt";
+const char *TCP_CONG_TYPE = "reno";
 
 int main(){
 
@@ -29,8 +31,9 @@ int main(){
     }
     printf("(Client) Socket created successfully\n");
 
-    // Set sock options to completely close the socket, for immediate reuse:
+    // Set sock options to completely close the socket (addr + port), for immediate reuse:
     int reuse_flag = 1;
+
     status = setsockopt(
         // The socket:
         sockfd,
@@ -47,6 +50,35 @@ int main(){
         exit(EXIT_FAILURE);
     }
 
+    status = setsockopt(
+        // The socket:
+        sockfd,
+        // The socket layer, more info: https://stackoverflow.com/questions/21515946/what-is-sol-socket-used-for
+        SOL_SOCKET,
+        // This option allows your server to bind to an address which is in a TIME_WAIT state 
+        SO_REUSEPORT,
+        // Setting to true
+        &reuse_flag,
+        sizeof(int)
+    );
+    if (status != 0){
+        perror("(Client) An error occured while setting the socket options");
+        exit(EXIT_FAILURE);
+    }
+
+    // Set sock options to specify Reno or Cubic
+    status = setsockopt(
+        sockfd,
+        IPPROTO_TCP,
+        TCP_CONGESTION,
+        TCP_CONG_TYPE,
+        strlen(TCP_CONG_TYPE)
+    );
+    if (status != 0){
+        perror("(Client) An error occured while setting the socket options");
+        exit(EXIT_FAILURE);
+    }
+    
     /* Create the TCP Connection */
 
     // Create the struct for the server's address:
