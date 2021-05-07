@@ -6,13 +6,11 @@
 #include <sys/socket.h> // For socket programming
 #include <arpa/inet.h> // Provides definitions for internet operations
 
-#define SIZE 1024
-
 /* Constants */
 int status; // Used for error handling
+const int SIZE = 1024; // in bytes
 const char* LOCAL_HOST = "127.0.0.1"; // Standard address for IPv4 loopback traffic
 // int const SIZE = 1024; // gives a weird error for some reason
-
 int RECV_PORT = 8080;
 char *PATH_SEND = "send.txt";
 
@@ -81,13 +79,15 @@ int main(){
     }
 
     // Send file:
-    char data[SIZE] = {0};
-    while(fgets(data, SIZE, f) != NULL){
+    char buffer[SIZE];
+    bzero(buffer, SIZE);
+
+    while(fgets(buffer, SIZE, f) != NULL){
 
         status = send(
             sockfd, 
-            data,
-            sizeof(data),
+            buffer,
+            sizeof(buffer),
             0
         );
 
@@ -96,7 +96,7 @@ int main(){
             exit(EXIT_FAILURE);
         }
 
-        bzero(data, SIZE); // Erase the data
+        bzero(buffer, SIZE); // Erase the buffer
 
     }
     printf("(Client) Successfully sent the file\n");

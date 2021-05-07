@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Compile:
-gcc -Wall -Wextra -o s.out client.c 
+
+gcc -Wall -Wextra -o c.out client.c 
 
 if [ $? -eq 0 ]; then
     echo "Client compilation successful"
@@ -10,7 +11,7 @@ else
     exit $?
 fi
 
-gcc -Wall -Wextra -o r.out server.c
+gcc -Wall -Wextra -o s.out server.c
 
 if [ $? -eq 0 ]; then
     echo "Server compilation successful"
@@ -20,5 +21,9 @@ else
 fi
 
 # Run
-./r.out &
 ./s.out &
+./c.out &
+
+# Clean up
+rm s.out
+rm c.out
