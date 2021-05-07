@@ -1,58 +1,68 @@
-#include <netdb.h>
-#include <netinet/in.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include <stdio.h> // For IO operations
+#include <stdlib.h> // Standard Library
+#include <unistd.h> // Standard POSIX functions, like "close"
+#include <string.h> // String manipulation for string packets etc
+#include <sys/time.h> // For timeval struct
+#include <sys/socket.h> // For socket programming
+#include <arpa/inet.h> // Provides definitions for internet operations
+#define SIZE 1024
 
-#define SERVER_PORT 5432
-#define MAX_LINE 256
+void send_file(FILE *fp, int sockfd){
 
-int main(int argc, char *argv[]) {
-  FILE *fp;
-  struct hostent *hp;
-  struct sockaddr_in sin;
-  char *host;
-  char buf[MAX_LINE];
-  int s;
-  int len;
+    int n;
+    char data[SIZE] = {0};
 
-  if (argc == 2) {
-    host = argv[1];
-  } else {
-    fprintf(stderr, "usage: simplex-talk host\n");
-    exit(1);
-  }
+    while(fgets(data, SIZE, fp) != NULL){
+        if (send(sockfd, data, sizeof(data), 0) == -1){
+            perror("[-]Error in sending file.");
+            exit(1);
+        }
+        bzero(data, SIZE);
+    }
 
-  /* translate host name into peer's IP address */
-  hp = gethostbyname(host);
-  if (!hp) {
-    fprintf(stderr, "simplex-talk: unknown host: %s\n", host);
-    exit(1);
-  }
+}
 
-  /* build address data structure */
-  bzero((char *)&sin, sizeof(sin));
-  sin.sin_family = AF_INET;
-  bcopy(hp->h_addr, (char *)&sin.sin_addr, hp->h_length);
-  sin.sin_port = htons(SERVER_PORT);
+int main(){
 
-  /* active open */
-  if ((s = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
-    perror("simplex-talk: socket");
-    exit(1);
-  }
-  if (connect(s, (struct sockaddr *)&sin, sizeof(sin)) < 0) {
-    perror("simplex-talk: connect");
-    close(s);
-    exit(1);
-  }
-  /* main loop: get and send lines of text */
-  while (fgets(buf, sizeof(buf), stdin)) {
-    buf[MAX_LINE - 1] = '\0';
-    len = strlen(buf) + 1;
-    send(s, buf, len, 0);
-  }
+    char *ip = "127.0.0.1";
+    int port = 8080;
+    int e;
+
+    int sockfd;
+    struct sockaddr_in server_addr;
+    FILE *fp;
+    char *filename = "send.txt";
+
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if(sockfd < 0) {
+        perror("[-]Error in socket");
+        exit(1);
+    }
+    printf("[+]Server socket created successfully.\n");
+
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = port;
+    server_addr.sin_addr.s_addr = inet_addr(ip);
+
+    e = connect(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr));
+        if(e == -1) {
+        perror("[-]Error in socket");
+        exit(1);
+    }
+    printf("[+]Connected to Server.\n");
+
+    fp = fopen(filename, "r");
+    if (fp == NULL) {
+        perror("[-]Error in reading file.");
+        exit(1);
+    }
+
+    send_file(fp, sockfd);
+    printf("[+]File data sent successfully.\n");
+
+    printf("[+]Closing the connection.\n");
+    close(sockfd);
+
+    return 0;
+    
 }

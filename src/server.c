@@ -1,47 +1,75 @@
-#include <netdb.h>
-#include <netinet/in.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include <time.h> // For setting seeds for random numbers
+#include <stdio.h> // For IO operations
+#include <stdlib.h> // Standard Library
+#include <unistd.h> // Standard POSIX functions, like "close"
+#include <string.h> // String manipulation for string packets etc
+#include <sys/time.h> // For timeval struct
+#include <sys/socket.h> // For socket programming
+#include <arpa/inet.h> // Provides definitions for internet operations
+#define SIZE 1024
 
-#define SERVER_PORT 5432
-#define MAX_PENDING 5
-#define MAX_LINE 256
+void write_file(int sockfd){
 
-int main() {
-  struct sockaddr_in sin;
-  char buf[MAX_LINE];
-  int buf_len, addr_len;
-  int s, new_s;
+    int n;
+    FILE *fp;
+    char *filename = "recv.txt";
+    char buffer[SIZE];
 
-  /* build address data structure */
-  bzero((char *)&sin, sizeof(sin));
-  sin.sin_family = AF_INET;
-  sin.sin_addr.s_addr = INADDR_ANY;
-  sin.sin_port = htons(SERVER_PORT);
-
-  /* setup passive open */
-  if ((s = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
-    perror("simplex-talk: socket");
-    exit(1);
-  }
-  if ((bind(s, (struct sockaddr *)&sin, sizeof(sin))) < 0) {
-    perror("simplex-talk: bind");
-    exit(1);
-  }
-  listen(s, MAX_PENDING);
-
-  /* wait for connection, then receive and print text */
-  while (1) {
-    if ((new_s = accept(s, (struct sockaddr *)&sin, &addr_len)) < 0) {
-      perror("simplex-talk: accept");
-      exit(1);
+    fp = fopen(filename, "w");
+    while (1){
+        n = recv(sockfd, buffer, SIZE, 0);
+        if (n <= 0){
+            break;
+            return;
+        }
+        fprintf(fp, "%s", buffer);
+        bzero(buffer, SIZE);
     }
-    while (buf_len = recv(new_s, buf, sizeof(buf), 0))
-      fputs(buf, stdout);
-    close(new_s);
-  }
+
+    return;
+}
+
+int main(){
+
+    char *ip = "127.0.0.1";
+    int port = 8080;
+    int e;
+
+    int sockfd, new_sock;
+    struct sockaddr_in server_addr, new_addr;
+    socklen_t addr_size;
+    char buffer[SIZE];
+
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if(sockfd < 0) {
+    perror("[-]Error in socket");
+    exit(1);
+    }
+    printf("[+]Server socket created successfully.\n");
+
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = port;
+    server_addr.sin_addr.s_addr = inet_addr(ip);
+
+    e = bind(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr));
+    if(e < 0) {
+    perror("[-]Error in bind");
+    exit(1);
+    }
+    printf("[+]Binding successfull.\n");
+
+    if(listen(sockfd, 10) == 0){
+    printf("[+]Listening....\n");
+    }else{
+    perror("[-]Error in listening");
+    exit(1);
+    }
+
+    addr_size = sizeof(new_addr);
+    new_sock = accept(sockfd, (struct sockaddr*)&new_addr, &addr_size);
+    write_file(new_sock);
+    printf("[+]Data written in the file successfully.\n");
+
+    return 0;
+    
 }
