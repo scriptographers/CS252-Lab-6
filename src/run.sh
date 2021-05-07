@@ -1,7 +1,9 @@
 #!/bin/bash
 
-# dd if=/dev/urandom bs=102400 count=1 status=none | base64 >send.txt
+FILE_SIZE=$1 # 100KB, 5MB etc
 
+dd if=/dev/urandom bs=$FILE_SIZE count=1 status=none | base64 >send.txt
+    
 # Compile:
 
 gcc -Wall -Wextra -o c.out client.c

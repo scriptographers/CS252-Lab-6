@@ -126,8 +126,15 @@ int main(){
     }
 
     fclose(f);
-    close(sockfd);
-    close(new_sockfd);
+
+    int status1 = close(new_sockfd);
+    int status2 = close(sockfd);
+
+    if (status1 == 0 && status2 == 0)
+        printf("(Server) Connection successfully closed\n");
+    else
+        perror("(Server) Error while closing the socket");
+
     printf("(Common) File transfer complete\n");
 
     return 0;

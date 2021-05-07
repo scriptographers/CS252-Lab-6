@@ -14,7 +14,7 @@ const char* LOCAL_HOST = "127.0.0.1"; // Standard address for IPv4 loopback traf
 // int const SIZE = 1024; // gives a weird error for some reason
 int RECV_PORT = 8080;
 char *PATH_SEND = "send.txt";
-const char *TCP_CONG_TYPE = "reno";
+const char *TCP_CONG_TYPE = "cubic";
 
 int main(){
 
@@ -132,10 +132,14 @@ int main(){
 
     }
     printf("(Client) Successfully sent the file\n");
-
-    printf("(Client) Connection closed\n");
-    close(sockfd);
+    
     fclose(f);
+
+    status = close(sockfd);
+    if (status == 0)
+        printf("(Client) Connection successfully closed\n");
+    else
+        perror("(Client) Error while closing the socket");
 
     return 0;
 
