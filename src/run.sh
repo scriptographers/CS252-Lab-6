@@ -20,6 +20,8 @@ else
     exit $?
 fi
 
+echo ""
+
 # Run
 ./s.out &
 ./c.out &

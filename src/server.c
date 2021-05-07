@@ -14,6 +14,7 @@ const char* LOCAL_HOST = "127.0.0.1"; // Standard address for IPv4 loopback traf
 // int const SIZE = 1024; // gives a weird error for some reason
 int RECV_PORT = 8080;
 char *PATH_RECV = "recv.txt";
+const int MAX_PENDING = 5;
 
 int main(){
     
@@ -57,10 +58,10 @@ int main(){
     server_addr.sin_port = htons(RECV_PORT);
     server_addr.sin_addr.s_addr = inet_addr(LOCAL_HOST);
 
-    // Bind server to server's port:
+    // Passive open: Bind server to server's port:
     status = bind(
         sockfd, 
-        (struct sockaddr*) &server_addr, 
+        (const struct sockaddr*) &server_addr, 
         sizeof(server_addr)
     );
     if(status < 0) {
@@ -69,7 +70,7 @@ int main(){
     }
     printf("(Server) Bind successful\n");
 
-    if(listen(sockfd, 10) == 0)
+    if(listen(sockfd, MAX_PENDING) == 0)
         printf("(Server) Listening...\n");
     else{
         perror("(Server) Unable to listen");
@@ -81,7 +82,7 @@ int main(){
     struct sockaddr_in client_addr;
     memset(&client_addr, 0, sizeof(client_addr));
     socklen_t len_caddr = sizeof(client_addr);
-    int new_sock = accept(
+    int new_sockfd = accept(
         sockfd, 
         (struct sockaddr*) &client_addr, 
         &len_caddr
@@ -95,7 +96,7 @@ int main(){
     bzero(buffer, SIZE);
 
     while (1){
-        status = recv(new_sock, buffer, SIZE, 0);
+        status = recv(new_sockfd, buffer, SIZE, 0);
         if (status == 0){
             printf("(Server) File contents saved successfully\n");
             break;
@@ -104,13 +105,13 @@ int main(){
             perror("(Server) Error while recieving file contents");
             exit(EXIT_FAILURE);
         }
-        fprintf(f, "%s", buffer);
+        fputs(buffer, f);
         bzero(buffer, SIZE);
     }
 
     fclose(f);
     close(sockfd);
-    close(new_sock);
+    close(new_sockfd);
     printf("(Common) File transfer complete\n");
 
     return 0;
