@@ -7,6 +7,10 @@
 #include <arpa/inet.h> // Provides definitions for internet operations
 #include <netinet/tcp.h> // Includes definitions for TCP
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/sendfile.h>
+
 /* Constants */
 int status; // Used for error handling
 const int SIZE = 1024; // in bytes
@@ -136,32 +140,27 @@ int main(int argc, char *argv[]){
     }
 
     // Send file:
-    char buffer[SIZE];
-    bzero(buffer, sizeof(buffer));
-
-    while(!feof(f)){
-
-        fread(buffer, sizeof(buffer) - 1, 1, f);
-
-        status = send(
-            sockfd, 
-            buffer,
-            sizeof(buffer),
-            0
-        );
-
-        if (status == -1){
-            perror("(Client) Error while sending the file");
-            exit(EXIT_FAILURE);
-        }
-        else{
-            // printf("(Client) %d Bytes sent\n", status);
-            // printf("(Client) %s\n", buffer);
-        }
-
-        bzero(buffer, sizeof(buffer)); // Erase the buffer
-
+    
+    // Using sendfile
+    struct stat file_stat;
+    // Load file description
+    int fd = fileno(f);
+    status = fstat(fd, &file_stat); 
+    if (status < 0){
+        perror("(Client) Error while getting file description");
+        exit(EXIT_FAILURE);
     }
+    printf("(Client) File Size: %ld bytes\n", file_stat.st_size);
+
+    int bytes_sent = sendfile(sockfd, fd, 0, file_stat.st_size);
+    if (bytes_sent < 0){
+        perror("(Client) Error while sending the file");
+        exit(EXIT_FAILURE);
+    }
+    else{
+        printf("(Client) %d bytes sent\n", bytes_sent);
+    }
+
     printf("(Client) Successfully sent the file\n");
     fclose(f);
 

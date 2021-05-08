@@ -138,7 +138,7 @@ int main(){
     gettimeofday(&t1, NULL);
 
     while (1){
-        status = recv(new_sockfd, buffer, sizeof(buffer), 0);
+        status = recv(new_sockfd, buffer, sizeof(buffer) - 1, 0);
         if (status == 0){
             printf("(Server) File contents saved successfully\n");
             break;
