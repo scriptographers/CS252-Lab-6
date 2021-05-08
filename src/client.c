@@ -79,6 +79,23 @@ int main(){
         exit(EXIT_FAILURE);
     }
     
+    // Set the SO_LINGER sock option
+    struct linger so_linger;
+    so_linger.l_onoff = 1;
+    so_linger.l_linger = 10;
+    status = setsockopt(
+        sockfd,
+        SOL_SOCKET,
+        SO_LINGER,
+        &so_linger,
+        sizeof(so_linger)
+    );
+    if (status != 0){
+        perror("(Client) An error occured while setting the socket options");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+
     /* Create the TCP Connection */
 
     // Create the struct for the server's address:
