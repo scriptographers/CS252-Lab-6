@@ -115,10 +115,9 @@ int main(){
     char buffer[SIZE];
     bzero(buffer, sizeof(buffer));
 
-    while(fgets(buffer, sizeof(buffer), f) != NULL){
+    while(!feof(f)){
 
-        //buffer[SIZE - 1] = '\0';
-        //int len = strlen(buffer) + 1;
+        fread(buffer, sizeof(buffer) - 1, 1, f);
 
         status = send(
             sockfd, 
