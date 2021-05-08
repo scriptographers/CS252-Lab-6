@@ -14,7 +14,27 @@ const char* LOCAL_HOST = "127.0.0.1"; // Standard address for IPv4 loopback traf
 // int const SIZE = 1024; // gives a weird error for some reason
 int RECV_PORT = 5432;
 char *PATH_RECV = "recv.txt";
-const int MAX_PENDING = 5;
+const int MAX_PENDING = 10;
+
+struct timeval diffTimeval(struct timeval t2, struct timeval t1){
+
+    // Reference for this function: https://stackoverflow.com/questions/32534392/timing-response-time-from-server
+    
+    struct timeval result;
+
+    result.tv_sec = t2.tv_sec - t1.tv_sec;      // subtract seconds
+    result.tv_usec = t2.tv_usec - t1.tv_usec;   // subtract microseconds
+
+    // microsecond result could be negative, ex. 2.1 - 1.9 = 1 sec - 800000 microseconds
+    // if so, subtract one second and add 1000000 microseconds
+    while (result.tv_usec < 0) {
+        result.tv_usec += 1000000;
+        result.tv_sec--;
+    }
+
+    return result;
+    
+}
 
 int main(){
     
@@ -113,6 +133,10 @@ int main(){
     char buffer[SIZE];
     bzero(buffer, sizeof(buffer));
 
+    // t1: file transfer started
+    struct timeval t1;
+    gettimeofday(&t1, NULL);
+
     while (1){
         status = recv(new_sockfd, buffer, sizeof(buffer), 0);
         if (status == 0){
@@ -131,6 +155,10 @@ int main(){
         bzero(buffer, sizeof(buffer));
     }
 
+    // t2: file transfer ended
+    struct timeval t2;
+    gettimeofday(&t2, NULL);
+
     fclose(f);
 
     int status1 = close(new_sockfd);
@@ -142,6 +170,9 @@ int main(){
         perror("(Server) Error while closing the socket");
 
     printf("(Common) File transfer complete\n");
+
+    struct timeval time_file = diffTimeval(t2, t1);
+    printf("\nTime taken for the file transfer: %ld.%06ld s\n", time_file.tv_sec, time_file.tv_usec);
 
     return 0;
 
