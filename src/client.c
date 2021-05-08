@@ -9,7 +9,7 @@
 
 /* Constants */
 int status; // Used for error handling
-const int SIZE = 1024; // in bytes
+const int SIZE = 256; // in bytes
 const char* LOCAL_HOST = "127.0.0.1"; // Standard address for IPv4 loopback traffic
 // int const SIZE = 1024; // gives a weird error for some reason
 int RECV_PORT = 5432;
@@ -115,21 +115,25 @@ int main(){
     char buffer[SIZE];
     bzero(buffer, sizeof(buffer));
 
-    while(fgets(buffer, SIZE, f) != NULL){
+    while(fgets(buffer, sizeof(buffer), f) != NULL){
 
-        buffer[SIZE - 1] = '\0';
-        int len = strlen(buffer) + 1;
+        //buffer[SIZE - 1] = '\0';
+        //int len = strlen(buffer) + 1;
 
         status = send(
             sockfd, 
             buffer,
-            len,
+            sizeof(buffer),
             0
         );
 
         if (status == -1){
             perror("(Client) Error while sending the file");
             exit(EXIT_FAILURE);
+        }
+        else{
+            // printf("(Client) %d Bytes sent\n", status);
+            // printf("(Client) %s\n", buffer);
         }
 
         bzero(buffer, sizeof(buffer)); // Erase the buffer

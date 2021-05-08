@@ -1,20 +1,25 @@
 #!/bin/bash
 
-if [ $# -ne 1 ]; then
-    echo "Usage: bash run.sh <file_size>"
+if [ $# -ne 2 ]; then
+    echo "Usage: bash run.sh <flag_gen_file> <file_size>"
     exit 1
 fi
 
-FILE_SIZE=$1 # 100KB, 5MB etc
+FLAG_GEN=$1 # 0 or 1
+FILE_SIZE=$2 # 100KB, 5MB etc
 
-# Generate the send file
+if [ $1 -eq 1 ]; then
 
-dd if=/dev/urandom bs=$FILE_SIZE count=1 status=none | base64 >send.txt
-if [ $? -eq 0 ]; then
-    echo "File generation successful"
-else
-    echo "File generation error"
-    exit $?
+    # Generate the send file
+
+    dd if=/dev/urandom bs=$FILE_SIZE count=1 status=none | base64 >send.txt
+    if [ $? -eq 0 ]; then
+        echo "File generation successful"
+    else
+        echo "File generation error"
+        exit $?
+    fi
+
 fi
     
 # Compile:

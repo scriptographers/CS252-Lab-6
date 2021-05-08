@@ -9,7 +9,7 @@
 
 /* Constants */
 int status; // Used for error handling
-const int SIZE = 1024; // In bytes
+const int SIZE = 256; // In bytes
 const char* LOCAL_HOST = "127.0.0.1"; // Standard address for IPv4 loopback traffic
 // int const SIZE = 1024; // gives a weird error for some reason
 int RECV_PORT = 5432;
@@ -123,8 +123,11 @@ int main(){
             perror("(Server) Error while recieving file contents");
             exit(EXIT_FAILURE);
         }
-        else
-            fputs(buffer, f);
+        else{
+            // printf("(Server) Recieved %d bytes\n", status);
+            fprintf(f, "%s", buffer);
+        }
+        // printf("(Server) %s\n", buffer);
         bzero(buffer, sizeof(buffer));
     }
 
