@@ -12,7 +12,7 @@ if [ $1 -eq 1 ]; then
 
     # Generate the send file
 
-    dd if=/dev/urandom bs=$FILE_SIZE count=1 status=none | base64 >send.txt
+    dd if=/dev/urandom bs=$FILE_SIZE count=1 status=none | base64 > send.txt
     if [ $? -eq 0 ]; then
         echo "File generation successful"
     else

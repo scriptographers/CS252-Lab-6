@@ -141,9 +141,9 @@ int main(){
     printf("(Client) Successfully sent the file\n");
     fclose(f);
 
-    status = close(sockfd);
+    status = shutdown(sockfd, SHUT_WR); //close(sockfd); // Reference: https://stackoverflow.com/questions/25476348/c-sockets-incomplete-file-transfer
     if (status == 0)
-        printf("(Client) Connection successfully closed\n");
+        printf("(Client) Connection successfully shutdown\n");
     else
         perror("(Client) Error while closing the socket");
 
