@@ -52,7 +52,10 @@ sleep 2
 ./c.out $TCP_CONG_PROT &
 P2=$!
 
-echo "Server Process ID: $1 | Client Process ID: $2"
+# Print process IDs, in case of a bug, kill the processes directly
+echo ""
+echo "Server Process ID: $P1 | Client Process ID: $P2"
+echo ""
 
 FAIL1=0
 FAIL2=0
