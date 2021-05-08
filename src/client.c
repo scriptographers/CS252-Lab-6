@@ -14,9 +14,16 @@ const char* LOCAL_HOST = "127.0.0.1"; // Standard address for IPv4 loopback traf
 // int const SIZE = 1024; // gives a weird error for some reason
 int RECV_PORT = 5432;
 char *PATH_SEND = "send.txt";
-const char *TCP_CONG_TYPE = "cubic";
 
-int main(){
+int main(int argc, char *argv[]){
+
+    /* Get args */
+    // Check no. of args specified:
+    if (argc != 2){ // 1+4 args are needed
+        printf("Usage: %s <congestion_protocol>\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+    const char *TCP_CONG_TYPE = argv[1];
 
     /* Create a TCP socket */
 

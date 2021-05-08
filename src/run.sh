@@ -1,14 +1,15 @@
 #!/bin/bash
 
-if [ $# -ne 2 ]; then
-    echo "Usage: bash run.sh <flag_gen_file> <file_size>"
+if [ $# -ne 3 ]; then
+    echo "Usage: bash run.sh <congestion_protocol> <flag_gen_file> <file_size>"
     exit 1
 fi
 
-FLAG_GEN=$1 # 0 or 1
-FILE_SIZE=$2 # 100KB, 5MB etc
+TCP_CONG_PROT=$1 # "reno" or "cubic"
+FLAG_GEN=$2 # 0 or 1
+FILE_SIZE=$3 # 100KB, 5MB etc
 
-if [ $1 -eq 1 ]; then
+if [ $FLAG_GEN -eq 1 ]; then
 
     # Generate the send file
 
@@ -48,8 +49,10 @@ echo ""
 ./s.out &
 P1=$!
 sleep 2
-./c.out &
+./c.out $TCP_CONG_PROT &
 P2=$!
+
+echo "Server Process ID: $1 | Client Process ID: $2"
 
 FAIL1=0
 FAIL2=0
