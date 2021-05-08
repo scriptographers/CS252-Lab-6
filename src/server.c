@@ -9,7 +9,7 @@
 
 /* Constants */
 int status; // Used for error handling
-const int SIZE = 1024; // In bytes
+const int SIZE = 4096; // In bytes
 const char* LOCAL_HOST = "127.0.0.1"; // Standard address for IPv4 loopback traffic
 // int const SIZE = 1024; // gives a weird error for some reason
 int RECV_PORT = 5432;

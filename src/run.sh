@@ -12,8 +12,8 @@ FILE_SIZE=$3 # 100KB, 5MB etc
 if [ $FLAG_GEN -eq 1 ]; then
 
     # Generate the send file
-
-    dd if=/dev/urandom bs=$FILE_SIZE count=1 status=none | base64 > send.txt
+    base64 /dev/urandom | head -c $FILE_SIZE > send.txt
+    
     if [ $? -eq 0 ]; then
         echo "File generation successful"
     else
