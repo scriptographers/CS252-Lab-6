@@ -12,7 +12,7 @@ int status; // Used for error handling
 const int SIZE = 1024; // In bytes
 const char* LOCAL_HOST = "127.0.0.1"; // Standard address for IPv4 loopback traffic
 // int const SIZE = 1024; // gives a weird error for some reason
-int RECV_PORT = 8080;
+int RECV_PORT = 5432;
 char *PATH_RECV = "recv.txt";
 const int MAX_PENDING = 5;
 
@@ -20,6 +20,7 @@ int main(){
     
     /* Create a TCP socket */
 
+    // Passive open
     int sockfd = socket(
         AF_INET, // IPv4
         SOCK_STREAM, // Specifies TCP socket
@@ -50,18 +51,14 @@ int main(){
     }
 
     status = setsockopt(
-        // The socket:
         sockfd,
-        // The socket layer, more info: https://stackoverflow.com/questions/21515946/what-is-sol-socket-used-for
         SOL_SOCKET,
-        // This option allows your server to bind to an address which is in a TIME_WAIT state 
         SO_REUSEPORT,
-        // Setting to true
         &reuse_flag,
         sizeof(int)
     );
     if (status != 0){
-        perror("(Client) An error occured while setting the socket options");
+        perror("(Server) An error occured while setting the socket options");
         exit(EXIT_FAILURE);
     }
 
@@ -77,7 +74,7 @@ int main(){
     // Passive open: Bind server to server's port:
     status = bind(
         sockfd, 
-        (const struct sockaddr*) &server_addr, 
+        (struct sockaddr*) &server_addr, 
         sizeof(server_addr)
     );
     if(status < 0) {
@@ -86,7 +83,8 @@ int main(){
     }
     printf("(Server) Bind successful\n");
 
-    if(listen(sockfd, MAX_PENDING) == 0)
+    status = listen(sockfd, MAX_PENDING);
+    if(status == 0)
         printf("(Server) Listening...\n");
     else{
         perror("(Server) Unable to listen");
@@ -103,16 +101,20 @@ int main(){
         (struct sockaddr*) &client_addr, 
         &len_caddr
     );
+    if (new_sockfd < 0){
+        perror("(Server) Error while creating the new socket");
+        exit(EXIT_FAILURE);
+    }
     
     // Create the file where the contents will be saved
     FILE *f;
     f = fopen(PATH_RECV, "w+");
 
     char buffer[SIZE];
-    bzero(buffer, SIZE);
+    bzero(buffer, sizeof(buffer));
 
     while (1){
-        status = recv(new_sockfd, buffer, SIZE, 0);
+        status = recv(new_sockfd, buffer, sizeof(buffer), 0);
         if (status == 0){
             printf("(Server) File contents saved successfully\n");
             break;
@@ -121,8 +123,9 @@ int main(){
             perror("(Server) Error while recieving file contents");
             exit(EXIT_FAILURE);
         }
-        fputs(buffer, f);
-        bzero(buffer, SIZE);
+        else
+            fputs(buffer, f);
+        bzero(buffer, sizeof(buffer));
     }
 
     fclose(f);

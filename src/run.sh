@@ -1,8 +1,21 @@
 #!/bin/bash
 
+if [ $# -ne 1 ]; then
+    echo "Usage: bash run.sh <file_size>"
+    exit 1
+fi
+
 FILE_SIZE=$1 # 100KB, 5MB etc
 
+# Generate the send file
+
 dd if=/dev/urandom bs=$FILE_SIZE count=1 status=none | base64 >send.txt
+if [ $? -eq 0 ]; then
+    echo "File generation successful"
+else
+    echo "File generation error"
+    exit $?
+fi
     
 # Compile:
 
@@ -29,10 +42,23 @@ echo ""
 # Run
 ./s.out &
 P1=$!
+sleep 2
 ./c.out &
 P2=$!
 
-wait $P1 $P2
+FAIL1=0
+FAIL2=0
+wait $P1 || let "FAIL1=1"
+wait $P2 || let "FAIL2=1"
+
+echo ""
+
+if [ "$FAIL1" == "0" ] && [ "$FAIL2" == "0" ];
+then
+    echo "Processes finished successfully"
+else
+    echo "Process(es) failed: $FAIL1 $FAIL2"
+fi
 
 echo ""
 

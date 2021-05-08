@@ -12,7 +12,7 @@ int status; // Used for error handling
 const int SIZE = 1024; // in bytes
 const char* LOCAL_HOST = "127.0.0.1"; // Standard address for IPv4 loopback traffic
 // int const SIZE = 1024; // gives a weird error for some reason
-int RECV_PORT = 8080;
+int RECV_PORT = 5432;
 char *PATH_SEND = "send.txt";
 const char *TCP_CONG_TYPE = "cubic";
 
@@ -20,6 +20,7 @@ int main(){
 
     /* Create a TCP socket */
 
+    // Active open
     int sockfd = socket(
         AF_INET, // IPv4
         SOCK_STREAM, // Specifies TCP socket
@@ -47,22 +48,20 @@ int main(){
     );
     if (status != 0){
         perror("(Client) An error occured while setting the socket options");
+        close(sockfd);
         exit(EXIT_FAILURE);
     }
 
     status = setsockopt(
-        // The socket:
         sockfd,
-        // The socket layer, more info: https://stackoverflow.com/questions/21515946/what-is-sol-socket-used-for
         SOL_SOCKET,
-        // This option allows your server to bind to an address which is in a TIME_WAIT state 
         SO_REUSEPORT,
-        // Setting to true
         &reuse_flag,
         sizeof(int)
     );
     if (status != 0){
         perror("(Client) An error occured while setting the socket options");
+        close(sockfd);
         exit(EXIT_FAILURE);
     }
 
@@ -76,6 +75,7 @@ int main(){
     );
     if (status != 0){
         perror("(Client) An error occured while setting the socket options");
+        close(sockfd);
         exit(EXIT_FAILURE);
     }
     
@@ -95,6 +95,7 @@ int main(){
     );
     if(status != 0){
         perror("(Client) Error in connecting to the server");
+        close(sockfd);
         exit(EXIT_FAILURE);
     }
     printf("(Client) Connected to the server\n");
@@ -112,14 +113,17 @@ int main(){
 
     // Send file:
     char buffer[SIZE];
-    bzero(buffer, SIZE);
+    bzero(buffer, sizeof(buffer));
 
     while(fgets(buffer, SIZE, f) != NULL){
+
+        buffer[SIZE - 1] = '\0';
+        int len = strlen(buffer) + 1;
 
         status = send(
             sockfd, 
             buffer,
-            sizeof(buffer),
+            len,
             0
         );
 
@@ -128,11 +132,10 @@ int main(){
             exit(EXIT_FAILURE);
         }
 
-        bzero(buffer, SIZE); // Erase the buffer
+        bzero(buffer, sizeof(buffer)); // Erase the buffer
 
     }
     printf("(Client) Successfully sent the file\n");
-    
     fclose(f);
 
     status = close(sockfd);
