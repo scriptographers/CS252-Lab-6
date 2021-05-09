@@ -1,27 +1,27 @@
-import numpy as np
-import scipy.stats as st
 import re
+import sys
 
-#for reno, open data.txt;
-#for cubic open data2.txt
-myf=open('data.txt') 
+import numpy as np
+import scipy.stats as stat
 
-#reading the data
-t=myf.readlines()
+if len(sys.argv) != 2:
+    print("Usage: python confidence_intervals.py <file_name>")
+    exit(1)
 
-for k in range(len(t)):
-    #stripping whitespace
-    t[k]=t[k].strip()
+myf = open(sys.argv[1])
 
-print("The following show respective confidence intervals, unit is kBps")
+# Read the data
+t = myf.readlines()
+
+print("The following shows respective confidence intervals (in kBps)\n")
 
 for i in range(9):
-    print(t[21*i])
-    #to store data for particular
-    meta=[]
+    print(t[21 * i], end='')
+    meta = []  # List of time taken for 20 runs
     for j in range(20):
-        mytime=float((re.findall("\d+\.\d+", t[21*i+j+1]))[0])
-        meta.append(5*1024/mytime)
-    iv=st.t.interval(alpha=0.9, df=len(meta)-1, loc=np.mean(meta), scale=st.sem(meta)) 
-    print(iv)
+        time = float((re.findall(r'\d+\.\d+', t[21 * i + j + 1]))[0])
+        meta.append(5 * 1024 / time)
+    # Confidence interval of 90% with degree of freedom 19 (one less than number of runs)
+    interval = stat.t.interval(alpha=0.9, df=len(meta) - 1, loc=np.mean(meta), scale=stat.sem(meta))
+    print(interval)
     print("")
