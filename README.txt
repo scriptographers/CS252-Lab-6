@@ -10,7 +10,7 @@ File Description:
 - src/server.c                : Server code
 - src/run.sh                  : Bash script for a single file transfer run
 - src/experiments.sh          : Bash script for the experiments
-- src/confidence_intervals.py : Python script for generating plots
+- src/confidence_intervals.py : Python script for analysis of experiments (mean, std dvn of throughput); and generating plots
 - src/send.txt                : The send file from the experiment
 - src/recv.txt                : The recv file from the experiment
 - src/Reno.txt                : The Reno log file from the experiment
