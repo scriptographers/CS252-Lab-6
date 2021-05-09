@@ -22,17 +22,17 @@ for tcp in ['TCP-Reno', 'TCP-Cubic']:
             time = float((re.findall(r'\d+\.\d+', t[21 * i + j + 1]))[0])
             data['Throughput (in kbps)'].append(5 * 1024 * 8 / time)
 
-        #calculating mean and standard deviation for each experiment
-        mymean=np.mean(data['Throughput (in kbps)'][21*i : 21*(i+1)])
-        mystd=np.std(data['Throughput (in kbps)'][21*i : 21*(i+1)])
-        print(f"Experiment {i+1} with {tcp}:\t Delay={t[21 * i].split()[0]},\t Loss={t[21 * i].split()[1]}:\t mean={mymean} kbps,\t std deviation={mystd} kbps")
+        # calculating mean and standard deviation for each experiment
+        mean = np.mean(data['Throughput (in kbps)'][21 * i: 21 * (i + 1)])
+        std = np.std(data['Throughput (in kbps)'][21 * i: 21 * (i + 1)])
+        print(f"Experiment {i+1} with {tcp}:\t Delay={t[21 * i].split()[0]},\t",
+              "Loss={t[21 * i].split()[1]}:\t Mean={mean} kbps,\t Std. Deviation={std} kbps")
 
 
 df = pd.DataFrame(data)
-#print(df)
+# print(df)
 
-#to generate confidence intervals plots:
-
+# to generate confidence intervals plots:
 g = sns.pointplot(x='Delay', y='Throughput (in kbps)',
                   hue='Congestion Protocol', data=df[df['Loss'] == '0.1%'],
                   ci=90, dodge=True, capsize=0.02).set_title('Loss 0.1%')
