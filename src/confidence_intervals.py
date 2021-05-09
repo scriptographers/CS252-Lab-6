@@ -23,3 +23,15 @@ for tcp in ['TCP-Reno', 'TCP-Cubic']:
 
 df = pd.DataFrame(data)
 print(df)
+
+g = sns.catplot(x='Delay', y='Throughput (in kbps)',
+                hue='Congestion Protocol', col='Loss',
+                data=df, kind='point',
+                dodge=True, ci=90, capsize=.02, height=8.0, aspect=12.0 / 8.0)
+plt.savefig('../plots/loss.png')
+
+g = sns.catplot(x='Loss', y='Throughput (in kbps)',
+                hue='Congestion Protocol', col='Delay',
+                data=df, kind='point',
+                dodge=True, ci=90, capsize=.02, height=8.0, aspect=12.0 / 8.0)
+plt.savefig('../plots/delay.png')
