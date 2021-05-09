@@ -68,14 +68,14 @@ int main() {
       // Setting to true
       &reuse_flag, sizeof(int));
   if (status != 0) {
-    perror("(Server) An error occured while setting the socket options");
+    perror("(Server) An error occurred while setting the socket options");
     exit(EXIT_FAILURE);
   }
 
   status =
       setsockopt(sockfd, SOL_SOCKET, SO_REUSEPORT, &reuse_flag, sizeof(int));
   if (status != 0) {
-    perror("(Server) An error occured while setting the socket options");
+    perror("(Server) An error occurred while setting the socket options");
     exit(EXIT_FAILURE);
   }
 
@@ -132,10 +132,10 @@ int main() {
       printf("(Server) File contents saved successfully\n");
       break;
     } else if (status < 0) {
-      perror("(Server) Error while recieving file contents");
+      perror("(Server) Error while receiving file contents");
       exit(EXIT_FAILURE);
     } else {
-      // printf("(Server) Recieved %d bytes\n", status);
+      // printf("(Server) Received %d bytes\n", status);
       fprintf(f, "%s", buffer);
     }
     // printf("(Server) %s\n", buffer);

@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
       // Setting to true
       &reuse_flag, sizeof(int));
   if (status != 0) {
-    perror("(Client) An error occured while setting the socket options");
+    perror("(Client) An error occurred while setting the socket options");
     close(sockfd);
     exit(EXIT_FAILURE);
   }
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
   status =
       setsockopt(sockfd, SOL_SOCKET, SO_REUSEPORT, &reuse_flag, sizeof(int));
   if (status != 0) {
-    perror("(Client) An error occured while setting the socket options");
+    perror("(Client) An error occurred while setting the socket options");
     close(sockfd);
     exit(EXIT_FAILURE);
   }
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
   status = setsockopt(sockfd, IPPROTO_TCP, TCP_CONGESTION, TCP_CONG_TYPE,
                       strlen(TCP_CONG_TYPE));
   if (status != 0) {
-    perror("(Client) An error occured while setting the socket options");
+    perror("(Client) An error occurred while setting the socket options");
     close(sockfd);
     exit(EXIT_FAILURE);
   }
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
   status =
       setsockopt(sockfd, SOL_SOCKET, SO_LINGER, &so_linger, sizeof(so_linger));
   if (status != 0) {
-    perror("(Client) An error occured while setting the socket options");
+    perror("(Client) An error occurred while setting the socket options");
     close(sockfd);
     exit(EXIT_FAILURE);
   }
