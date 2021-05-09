@@ -1,7 +1,10 @@
 #!/bin/bash
 
+# Set mtu
+sudo ifconfig lo mtu 1500
+
+# Add lo to network emulator (need to "add" once before "change")
 sudo tc qdisc add dev lo root netem loss 1% delay 100ms &>/dev/null
-# Needed to "add" once before "change"
 
 # Generate send.txt
 base64 /dev/urandom | head -c 5MB >send.txt
