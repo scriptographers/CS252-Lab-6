@@ -34,31 +34,31 @@ else
 fi
 
 # TCP-Reno Experiments
-rm -rf reno.txt
+rm -rf Reno.txt
 echo ""
 echo "Starting experiments on TCP-Reno:"
 for j in 10ms 50ms 100ms; do
     for k in 0.1% 0.5% 1%; do
         sudo tc qdisc change dev lo root netem loss $k delay $j
-        echo "$j $k" >>reno.txt
+        echo "$j $k" >>Reno.txt
         for i in {1..20}; do
             echo "TCP-Reno Delay:$j Loss:$k Run#:$i"
-            bash run.sh reno 0 5MB 0 | grep "transfer:" >>reno.txt
+            bash run.sh reno 0 5MB 0 | grep "transfer:" >>Reno.txt
         done
     done
 done
 
 # TCP-Cubic Experiments
-rm -rf cubic.txt
+rm -rf Cubic.txt
 echo ""
 echo "Starting experiments on TCP-Cubic:"
 for j in 10ms 50ms 100ms; do
     for k in 0.1% 0.5% 1%; do
         sudo tc qdisc change dev lo root netem loss $k delay $j
-        echo "$j $k" >>cubic.txt
+        echo "$j $k" >>Cubic.txt
         for i in {1..20}; do
             echo "TCP-Cubic Delay:$j Loss:$k Run#:$i"
-            bash run.sh cubic 0 5MB 0 | grep "transfer:" >>cubic.txt
+            bash run.sh cubic 0 5MB 0 | grep "transfer:" >>Cubic.txt
         done
     done
 done
