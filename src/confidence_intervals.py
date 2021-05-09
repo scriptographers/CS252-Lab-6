@@ -24,14 +24,38 @@ for tcp in ['TCP-Reno', 'TCP-Cubic']:
 df = pd.DataFrame(data)
 print(df)
 
-g = sns.catplot(x='Delay', y='Throughput (in kbps)',
-                hue='Congestion Protocol', col='Loss',
-                data=df, kind='point',
-                dodge=True, ci=90, capsize=.02, height=8.0, aspect=12.0 / 8.0)
-plt.savefig('../plots/loss.png')
+g = sns.pointplot(x='Delay', y='Throughput (in kbps)',
+                  hue='Congestion Protocol', data=df[df['Loss'] == '0.1%'],
+                  ci=90, dodge=True, capsize=0.02).set_title('Loss 0.1%')
+plt.savefig('../plots/0.1% loss.png')
+plt.clf()
 
-g = sns.catplot(x='Loss', y='Throughput (in kbps)',
-                hue='Congestion Protocol', col='Delay',
-                data=df, kind='point',
-                dodge=True, ci=90, capsize=.02, height=8.0, aspect=12.0 / 8.0)
-plt.savefig('../plots/delay.png')
+g = sns.pointplot(x='Delay', y='Throughput (in kbps)',
+                  hue='Congestion Protocol', data=df[df['Loss'] == '0.5%'],
+                  ci=90, dodge=True, capsize=0.02).set_title('Loss 0.5%')
+plt.savefig('../plots/0.5% loss.png')
+plt.clf()
+
+g = sns.pointplot(x='Delay', y='Throughput (in kbps)',
+                  hue='Congestion Protocol', data=df[df['Loss'] == '1%'],
+                  ci=90, dodge=True, capsize=0.02).set_title('Loss 1.0%')
+plt.savefig('../plots/1.0% loss.png')
+plt.clf()
+
+g = sns.pointplot(x='Loss', y='Throughput (in kbps)',
+                  hue='Congestion Protocol', data=df[df['Delay'] == '10ms'],
+                  ci=90, dodge=True, capsize=0.02).set_title('Delay 10ms')
+plt.savefig('../plots/10ms delay.png')
+plt.clf()
+
+g = sns.pointplot(x='Loss', y='Throughput (in kbps)',
+                  hue='Congestion Protocol', data=df[df['Delay'] == '50ms'],
+                  ci=90, dodge=True, capsize=0.02).set_title('Delay 50ms')
+plt.savefig('../plots/50ms delay.png')
+plt.clf()
+
+g = sns.pointplot(x='Loss', y='Throughput (in kbps)',
+                  hue='Congestion Protocol', data=df[df['Delay'] == '100ms'],
+                  ci=90, dodge=True, capsize=0.02).set_title('Delay 100ms')
+plt.savefig('../plots/100ms delay.png')
+plt.clf()
