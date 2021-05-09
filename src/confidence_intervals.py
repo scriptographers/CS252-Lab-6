@@ -1,27 +1,25 @@
 import re
-import sys
 
-import numpy as np
-import scipy.stats as stat
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
 
-if len(sys.argv) != 2:
-    print("Usage: python confidence_intervals.py <file_name>")
-    exit(1)
+sns.set_theme(style="darkgrid")
+sns.set(rc={'figure.figsize': (16, 12)})
 
-myf = open(sys.argv[1])
+data = {'Congestion Protocol': [], 'Delay': [], 'Loss': [], 'Throughput (in kbps)': []}
 
-# Read the data
-t = myf.readlines()
+for tcp in ['TCP-Reno', 'TCP-Cubic']:
 
-print("The following shows respective confidence intervals (in kBps)\n")
+    t = open('{}.txt'.format(tcp[4:])).readlines()
 
-for i in range(9):
-    print(t[21 * i], end='')
-    meta = []  # List of time taken for 20 runs
-    for j in range(20):
-        time = float((re.findall(r'\d+\.\d+', t[21 * i + j + 1]))[0])
-        meta.append(5 * 1024 / time)
-    # Confidence interval of 90% with degree of freedom 19 (one less than number of runs)
-    interval = stat.t.interval(alpha=0.9, df=len(meta) - 1, loc=np.mean(meta), scale=stat.sem(meta))
-    print(interval)
-    print("")
+    for i in range(9):
+        for j in range(20):
+            data['Congestion Protocol'].append(tcp)
+            data['Delay'].append(t[21 * i].split()[0])
+            data['Loss'].append(t[21 * i].split()[1])
+            time = float((re.findall(r'\d+\.\d+', t[21 * i + j + 1]))[0])
+            data['Throughput (in kbps)'].append(5 * 1024 * 8 / time)
+
+df = pd.DataFrame(data)
+print(df)
