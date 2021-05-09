@@ -17,6 +17,7 @@ File Description:
 - src/Cubic.txt               : The Cubic log file from the experiment
 - plots/*.png                 : Plots comparing TCP-Reno and TCP-Cubic
 - wireshark_graphs/*.png      : Annotated Window Scaling graphs
+- report/report.pdf           : Report
 
 Usage:
 - Conducting the experiments and generating plots:
