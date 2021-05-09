@@ -25,8 +25,8 @@ Usage:
         - It will save time taken in Reno.txt for TCP-Reno runs and Cubic.txt for TCP-Cubic runs
         - Assumption: The loopback interface is lo.
     - After completion of experiments, execute: python3 confidence_intervals.py
+        - Required plots are generated in plots/
         - Assumption: pandas, matplotlib and seaborn are installed.
-    - Required plots are generated in plots/
 
 - Running a single file transfer:
     - cd to src/
